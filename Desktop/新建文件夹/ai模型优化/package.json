@@ -1,0 +1,31 @@
+{
+  "name": "llm-optimization",
+  "version": "1.0.0",
+  "description": "LLM API optimization strategies including caching, token trimming, and request batching",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "test": "jest",
+    "start": "node dist/index.js",
+    "test:performance": "node scripts/performance-test.js",
+    "test:cache": "node scripts/cache-performance-test.js",
+    "test:token": "node scripts/test-token-limits.js"
+  },
+  "keywords": ["llm", "ai", "optimization", "caching", "token"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1",
+    "ioredis": "^5.3.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/uuid": "^9.0.7",
+    "typescript": "^5.3.2",
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.10"
+  }
+}
