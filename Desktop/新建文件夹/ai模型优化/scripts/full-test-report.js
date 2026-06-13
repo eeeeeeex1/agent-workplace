@@ -1,7 +1,7 @@
 const https = require('https');
 const crypto = require('crypto');
 
-const apiKey = 'sk-KaiJT0Mf6JjRGGYUoXUYdFgLW6cTT6ZvZUlLwNXy0gbGkP9X';
+const apiKey = process.env.VIVA_API_KEY || process.env.VIVA_CLAUDE_API_KEY || '';
 const apiUrl = 'https://www.vivaapi.cn/v1/messages';
 const model = 'claude-opus-4-8';
 

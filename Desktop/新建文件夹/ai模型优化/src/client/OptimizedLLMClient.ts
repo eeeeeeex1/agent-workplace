@@ -3,12 +3,14 @@ import { LLMAdapter } from '../adapters/LLMAdapter';
 import { AdapterFactory, ProviderType, AdapterConfig } from '../adapters/AdapterFactory';
 import { CacheManager } from '../cache/CacheManager';
 import { TokenTrimmer } from '../tokenizer/TokenTrimmer';
+import { PromptOptimizer } from '../tokenizer/PromptOptimizer';
 import { RequestQueue } from '../queue/RequestQueue';
 
 export class OptimizedLLMClient extends RequestQueue {
   private adapter: LLMAdapter;
   private cacheManager: CacheManager;
   private tokenTrimmer: TokenTrimmer;
+  private promptOptimizer: PromptOptimizer;
   private requestCount = 0;
   private cacheHitCount = 0;
   private totalProcessingTime = 0;
@@ -18,6 +20,7 @@ export class OptimizedLLMClient extends RequestQueue {
     this.adapter = AdapterFactory.create(config);
     this.cacheManager = new CacheManager();
     this.tokenTrimmer = new TokenTrimmer();
+    this.promptOptimizer = new PromptOptimizer();
   }
 
   static create(provider: ProviderType, apiKey: string, secretKey?: string, baseUrl?: string): OptimizedLLMClient {
@@ -27,7 +30,8 @@ export class OptimizedLLMClient extends RequestQueue {
   async chat(request: LLMRequest, priority: 'high' | 'normal' | 'low' = 'normal'): Promise<LLMResponse> {
     this.requestCount++;
 
-    const trimmedMessages = this.tokenTrimmer.trimMessages(request.messages, request.model);
+    const promptOptimization = this.promptOptimizer.optimize(request);
+    const trimmedMessages = this.tokenTrimmer.trimMessages(promptOptimization.messages, request.model);
     const trimmedRequest: LLMRequest = { ...request, messages: trimmedMessages };
 
     const cachedResponse = await this.cacheManager.get(trimmedRequest);
@@ -96,6 +100,15 @@ export class OptimizedLLMClient extends RequestQueue {
       queueStats: this.getStats(),
       cacheStats: this.cacheManager.getStats(),
     };
+  }
+
+  warmUpPromptTemplate(id: string, request: LLMRequest): void {
+    const bucket = `${request.model}|temp:${request.temperature === undefined ? 'default' : request.temperature}|topP:${request.topP === undefined ? 'default' : request.topP}|max:${request.maxTokens === undefined ? 'default' : request.maxTokens}`;
+    this.promptOptimizer.registerTemplate(bucket, id, request.messages);
+  }
+
+  getPromptOptimizationStats() {
+    return this.promptOptimizer.getStats();
   }
 
   async warmUpCache(requests: LLMRequest[]): Promise<void> {

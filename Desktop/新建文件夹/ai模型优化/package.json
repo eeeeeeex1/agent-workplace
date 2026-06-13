@@ -10,7 +10,11 @@
     "start": "node dist/index.js",
     "test:performance": "node scripts/performance-test.js",
     "test:cache": "node scripts/cache-performance-test.js",
-    "test:token": "node scripts/test-token-limits.js"
+    "test:token": "node scripts/test-token-limits.js",
+    "token:record": "node scripts/token-usage-logger.js record",
+    "token:report": "node scripts/token-usage-logger.js report",
+    "test:prompt-optimization": "node scripts/prompt-optimization-test.js",
+    "test:advanced-cache": "node scripts/advanced-cache-optimization-test.js"
   },
   "keywords": ["llm", "ai", "optimization", "caching", "token"],
   "author": "",
